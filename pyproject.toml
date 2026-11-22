@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hpt-siem-elk-skills"
+version = "0.1.0"
+description = "Read-only Kibana investigation tools for MCP and Agent Skills"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+dependencies = [
+  "requests>=2.32.4,<3",
+  "keyring>=25,<26",
+  "cryptography>=44",
+  "filelock>=3.16,<4",
+  "platformdirs>=4,<5",
+]
+
+[project.optional-dependencies]
+login = ["playwright>=1.50,<2"]
+mcp = ["mcp>=1.25,<2"]
+
+[project.scripts]
+hpt-siem = "hpt_siem.cli:main"
+hpt-siem-mcp = "hpt_siem.mcp_server:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

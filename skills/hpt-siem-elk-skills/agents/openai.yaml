@@ -1,0 +1,3 @@
+interface:
+  display_name: "HPT_SIEM_ELK_Skills"
+  short_description: "Investigate Kibana logs and security alerts"

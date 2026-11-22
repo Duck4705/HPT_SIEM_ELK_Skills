@@ -1,0 +1,7 @@
+{
+  "query": {
+    "range": {
+      "http.response.status_code": {"gte": 500}
+    }
+  }
+}
