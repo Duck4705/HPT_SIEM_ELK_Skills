@@ -96,6 +96,8 @@ Cài lại project bằng lệnh cài đặt ở trên, cập nhật thư mục 
 
 Xem [danh sách 14 tool và ví dụ tham số](../skills/hpt-siem-elk-skills/references/tool-workflows.md). Tài liệu này đi cùng thư mục skill, nên agent có thể đọc sau khi cài riêng skill.
 
+Khi số alert khác Kibana, xem [cách đối chiếu bộ lọc và building block](../skills/hpt-siem-elk-skills/references/tool-workflows.md#đối-chiếu-số-alert-với-kibana).
+
 ## Phạm vi space và namespace
 
 `space` chọn ngữ cảnh Kibana, nơi có data view, rule và alert của space. Một data view trong space vẫn có thể trỏ đến nhiều data stream. Namespace là nhãn của dữ liệu nguồn, ví dụ `prod` hoặc `qa`. Tài khoản có quyền đọc nhiều nguồn có thể thấy log từ nhiều namespace trong cùng một data view. [Kibana spaces và Elastic Security](https://www.elastic.co/docs/solutions/security/get-started/spaces-elastic-security) · [Data streams và namespace](https://www.elastic.co/docs/reference/fleet/data-streams).

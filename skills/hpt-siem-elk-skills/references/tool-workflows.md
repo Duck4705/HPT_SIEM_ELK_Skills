@@ -82,6 +82,41 @@ Ví dụ gọi `HPT_check_alerts` để lấy 5 alert gần nhất trong 30 phú
 2. Truy vết bằng `HPT_query` trên nguồn log đã xác minh. Ưu tiên ID/index gốc trong `kibana.alert.ancestors.*` và `kibana.alert.original_time` nếu phù hợp với loại rule. Khi thiếu ID nguồn, lọc theo host, IP hoặc định danh tiến trình trong cửa sổ hẹp. Giữ điều kiện namespace khi nguồn dùng chung.
 3. Nêu rõ bằng chứng nối trực tiếp với sự kiện gốc và các log chỉ trùng ngữ cảnh. Nếu alert thiếu namespace gốc, đối chiếu log nguồn trước khi gán. Tổng từ `HPT_check_alerts` là tổng theo space và các bộ lọc mà tool hỗ trợ. Muốn đếm riêng namespace, chỉ dùng `HPT_query` trên alias alert riêng của space khi đã xác minh quyền đọc, field và độ phủ.
 
+## Đối chiếu số alert với Kibana
+
+`HPT_check_alerts` đọc cả alert thường và building block alerts. `fields` chỉ chọn trường trả về. Thêm `kibana.alert.building_block_type` vào `fields` để nhận diện building block trong từng bản ghi. Tổng `data.total` vẫn bao gồm các loại alert khớp với những bộ lọc tool hỗ trợ.
+
+1. Xác nhận Kibana đang hiển thị space nào, khoảng thời gian nào và theo múi giờ nào. Với **Today**, dùng `start` từ 00:00 và `end` tại thời điểm đối chiếu, có múi giờ rõ ràng. Dùng `workflow_status: ["open"]` với `HPT_check_alerts` khi UI lọc **Status = open**. Giữ các bộ lọc khác của UI nếu có.
+2. Nếu UI ẩn building block, dùng `HPT_query` với Search DSL trên **alias alert cụ thể của đúng space** khi đã xác minh đường Console và quyền đọc alias. Thêm `must_not` với `exists` trên `kibana.alert.building_block_type`. Dùng `data.total` để đối chiếu, với `total.relation: "eq"` và `isPartial: false`. `limit: 1` chỉ giới hạn số dòng trả về.
+3. Nếu Console chưa dùng được, dùng `HPT_check_alerts` để đọc các lô theo cùng phạm vi. Nếu phân trang lặp lại kết quả, chia thành các khoảng thời gian liền kề. Khử trùng theo `_index` và `_id`, rồi đếm các bản ghi không có field building block. Chỉ báo tổng theo UI khi đã xác minh đọc đủ và có thể phân loại bản ghi. Nếu chỉ đọc được mẫu, báo phạm vi đã đọc và số liệu của mẫu.
+
+Ví dụ JSON cho `HPT_query` khi đối chiếu **alert đang mở, ẩn building block** trong một space mẫu.
+
+```json
+{
+  "siem": "demo",
+  "space": "soc",
+  "index": ".alerts-security.alerts-soc",
+  "backend": "api",
+  "api": "console",
+  "language": "dsl",
+  "start": "2026-01-15T00:00:00+07:00",
+  "end": "2026-01-15T10:00:00+07:00",
+  "limit": 1,
+  "fields": ["@timestamp", "kibana.space_ids"],
+  "query": {
+    "query": {
+      "bool": {
+        "filter": [{"term": {"kibana.alert.workflow_status": "open"}}],
+        "must_not": [{"exists": {"field": "kibana.alert.building_block_type"}}]
+      }
+    }
+  }
+}
+```
+
+Nếu UI bật hiển thị building block, bỏ điều kiện `must_not` để đối chiếu cùng phạm vi.
+
 ## Đọc kết quả và xử lý lỗi
 
 - Dùng `data.adapter` để biết đường thực tế. `auto` ưu tiên REST và có thể dùng Discover cho truy vấn tương thích. Dùng `backend: "api"` nếu yêu cầu chỉ dùng REST. Với Discover, ưu tiên `fields` để chọn đầu ra. Search DSL, `source` và `offset` dùng REST.

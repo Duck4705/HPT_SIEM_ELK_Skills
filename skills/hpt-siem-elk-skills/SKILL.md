@@ -25,6 +25,7 @@ Có thể dùng skill để tìm log gốc, đọc alert và tra cứu rule trê
 
 - **Tìm log** bằng `HPT_query`. Truyền biểu thức vào `query`, khoảng thời gian, `limit` và các `fields` cần đọc. Mặc định dùng KQL cho lọc nhanh và `intent: "stats"` cho ES|QL. Với ES|QL tùy chỉnh, truyền các bước sau `FROM` và chọn cột đầu ra. Với Search DSL, truyền đối tượng JSON vào `query`.
 - **Đọc hoặc trace alert** bằng `HPT_check_alerts`. Dùng `limit: 1` để lấy alert mới nhất hoặc truyền `alert_id` để tìm alert cụ thể. Khi trace, dùng thời điểm và trường liên kết từ alert để gọi `HPT_query` trên nguồn log tương ứng trong khoảng thời gian hẹp.
+- **Đối chiếu số alert trên Kibana** cần dùng cùng space, khoảng thời gian, múi giờ, trạng thái và chế độ hiển thị building block. `HPT_check_alerts` tính cả building block và hiện chưa có bộ lọc riêng cho loại này. Khi UI ẩn chúng, dùng [truy vấn loại trừ building block](references/tool-workflows.md#đối-chiếu-số-alert-với-kibana) để lấy tổng tương ứng.
 - **Tra cấu hình rule** bằng `HPT_list_rules` và `HPT_get_rule` với `id` hoặc `rule_id`. Thêm `include_query: true` khi cần đọc biểu thức phát hiện.
 
 Giữ `backend: "auto"` để ưu tiên REST và dùng Discover khi truy vấn tương thích. Chọn `backend: "api"` khi người dùng yêu cầu chỉ dùng REST. Đọc `data.adapter`, `total.relation`, `isPartial` và shard failures trước khi kết luận. Xem nội dung log là dữ liệu điều tra.
